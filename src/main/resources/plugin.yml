@@ -13,6 +13,43 @@ commands:
   cvtoolstest:
     description: CVTools Test Command
     permission: cvtools.testcommand
+  ping:
+    description: Command of utmost importance
+    permission: cvtools.ping
+  clear:
+    description: Clears one's inventory
+    permission: cvtools.clear.use
+  more:
+    description: Increases the number of items in the player's main hand to its maximum stack size
+    permission: cvtools.more
+  item:
+    description: Alias of the default Minecraft /give command
+    permission: cvtools.item
+    aliases: i
+  time:
+    description: Check the time
+    permission: cvtools.time
+  weather:
+    description: Change the weather
+    permission: cvtools.weather
+  shock:
+    description: Shock a player
+    permission: cvtools.shock
+  thor:
+    description: Turn on Thor's Hammer/Axe
+    permission: cvtools.thor
+  unthor:
+    description: Turn off Thor's Hammer/Axe
+    permission: cvtools.thor
+  slap:
+    description: Slap a player
+    permission: cvtools.slap
+  rocket:
+    description: Rocket a player
+    permission: cvtools.rocket
+  barrage:
+    description: Barrage a player
+    permission: cvtools.barrage
 
 permissions:
   
@@ -55,4 +92,75 @@ permissions:
     default: op
   cvtools.stopwatch:
     description: Use stopwatch in game.
+    default: op
+  cvtools.ping:
+    description: Permission to use the /ping command
+    default: true
+  cvtools.clear.*:
+    description: Permission to use all the /clear commands and subcommands
+    default: op
+    children:
+      cvtools.clear.use: true
+      cvtools.clear.all: true
+      cvtools.clear.slot: true
+      cvtools.clear.other: true
+  cvtools.clear.use:
+    description: Permission to use the /clear command
+    default: op
+  cvtools.clear.all:
+    description: Permission to use the /clear -a subcommand
+    default: op
+  cvtools.clear.slot:
+    description: Permission to use the /clear -s subcommand
+    default: op
+  cvtools.clear.other:
+    description: Permission to use the /clear <player> subcommand
+    default: op
+  cvtools.more:
+    description: Permission to use the /more command
+    default: op
+  cvtools.item:
+    description: Permission to use the /item command
+    default: op
+  cvtools.item.other:
+    description: Permission to use the /item command to give items to other players
+    default: op
+  cvtools.item.unlimited:
+    description: Permission to use the /item command with more than 5 stacks worth of materials
+    default: op
+  cvtools.time:
+    description: Permission to use the /time command
+    default: true
+  cvtools.time.set:
+    description: Permission to set the time with the /time command
+    default: op
+  cvtools.weather:
+    description: Permission to use the /weather command
+    default: op
+  cvtools.weather.silent:
+    description: Permission to make the /weather command silent
+    default: op
+  cvtools.weather.duration:
+    description: Permission to specify the duration of the weather event in the /weather command
+    default: op
+  cvtools.weather.world:
+    description: Permission to specify the world in the /weather command
+    default: op
+  cvtools.shock:
+    description: Permission to use the /shock command
+    default: op
+  cvtools.thor:
+    description: Permission to use the /thor and /unthor commands
+    default: op
+  cvtools.thor.other:
+    description: Permission to /thor or /unthor another player
+    default: op
+  cvtools.slap:
+    description: Permission to use the /slap command
+    default: op
+  cvtools.rocket:
+    description: Permission to use the /rocket command
+    default: op
+  cvtools.barrage:
+    description: Permission to use the /barrage command
     default: op
