@@ -40,8 +40,9 @@ public class CreatePlot extends Command {
 	private final int PLOT_DISTANCE = 4; // Distance between Plots
 	private final int ROAD_SIZE = 3; // Size of the road on the template itself
 	private final int MAX_PLOTS = 1000;
-	private final int PASTE_HEIGHT = 3;
-	private final int PLOT_HEIGHT = 200;
+	private final int PASTE_Y = 3;
+	private final int WG_REGION_MIN_Y = 5;
+	private final int WG_REGION_MAX_Y = 254;
 	private final CuboidRegion PLOT_TEMPLATE = new CuboidRegion(
 			BukkitAdapter.adapt(CREATIVE_WORLD),
 			BlockVector3.at(-7, 103, -7),
@@ -81,7 +82,7 @@ public class CreatePlot extends Command {
 
 	// TODO Switch player to Player class and add player as UUID
 	private void createPlotRegion(BlockVector3 min, String player) {
-		BlockVector3 max = BlockVector3.at(min.getX() + REGION_SIZE - 1, PASTE_HEIGHT + PLOT_HEIGHT, min.getZ() + REGION_SIZE - 1);
+		BlockVector3 max = BlockVector3.at(min.getX() + REGION_SIZE - 1, WG_REGION_MAX_Y, min.getZ() + REGION_SIZE - 1);
 		ProtectedRegion region = new ProtectedCuboidRegion(String.format("%s_plot", player), min, max);
 		region.getMembers().addPlayer(player);
 		region.setFlag(Flags.GREET_MESSAGE, String.format("&bEntering the plot of &3%s&b!", player));
@@ -94,6 +95,7 @@ public class CreatePlot extends Command {
 	}
 
 	private BlockVector3 offsetVectorByRoad(BlockVector3 loc) {
+		loc = loc.withY(PASTE_Y);
 		return loc.subtract(ROAD_SIZE, 0 , ROAD_SIZE);
 	}
 
@@ -110,7 +112,7 @@ public class CreatePlot extends Command {
 		for (int i = 0; i < MAX_PLOTS; i++) {
 			BlockVector3 plotLocation = BlockVector3.at(
 					gridLocation.getX() * (REGION_SIZE + PLOT_DISTANCE),
-					PASTE_HEIGHT,
+					WG_REGION_MIN_Y,
 					gridLocation.getZ()  * (REGION_SIZE + PLOT_DISTANCE)
 			);
 			ApplicableRegionSet pointRegionSet = allRegions.getApplicableRegions(plotLocation);
