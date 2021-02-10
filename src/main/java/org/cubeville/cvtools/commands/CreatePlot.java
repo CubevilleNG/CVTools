@@ -33,51 +33,31 @@ import org.cubeville.commons.commands.CommandParameterString;
 import org.cubeville.commons.commands.CommandResponse;
 
 public class CreatePlot extends Command {
-	
-	private final World CREATIVE_WORLD = Bukkit.getServer().getWorld("plugin_test");
+
+	private final String CREATIVE_WORLD_NAME = "plugin_test";
+	private final World CREATIVE_WORLD = Bukkit.getServer().getWorld(CREATIVE_WORLD_NAME);
 
 	private final int REGION_SIZE = 9; // Size of the square region
 	private final int PLOT_DISTANCE = 4; // Distance between Plots
-	private final int ROAD_SIZE = 3; // Size of the road on the template itself
 	private final int MAX_PLOTS = 1000;
 	private final int PASTE_Y = 3;
 	private final int WG_REGION_MIN_Y = 5;
 	private final int WG_REGION_MAX_Y = 254;
-	private final CuboidRegion PLOT_TEMPLATE = new CuboidRegion(
-			BukkitAdapter.adapt(CREATIVE_WORLD),
-			BlockVector3.at(-7, 103, -7),
-			BlockVector3.at(7, 102, 7)
-	);
+	private final String TEMPLATE_REGION = "creative_plot_template";
 
 	public CreatePlot() {
 		super("createplot");
 		addBaseParameter(new CommandParameterString());
 	}
 
-	private void copyPlotToLocation(BlockVector3 loc) throws CommandExecutionException {
-
-		BlockArrayClipboard clipboard = new BlockArrayClipboard(PLOT_TEMPLATE);
-
-		try (EditSession editSession = WorldEdit.getInstance().getEditSessionFactory()
-				.getEditSession(BukkitAdapter.adapt(CREATIVE_WORLD), -1)) {
-
-			// Copy the plot template to the clipboard
-			ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
-					editSession, PLOT_TEMPLATE, clipboard, PLOT_TEMPLATE.getMinimumPoint()
-			);
-			Operations.complete(forwardExtentCopy);
-
-			// Paste the plot template to the location specified
-			Operation operation = new ClipboardHolder(clipboard)
-					.createPaste(editSession)
-					.to(loc)
-					.build();
-			Operations.complete(operation);
-		}
-		catch (WorldEditException e) {
-			System.out.println(e);
-			throw new CommandExecutionException("Ran into issue with Copy / Paste on WE API");
-		}
+	private void copyPlotToLocation(BlockVector3 loc) {
+		String cmd = String.format("cvblocks copytocoord %s %s %s %d %d %d",
+			CREATIVE_WORLD_NAME, // source world
+			TEMPLATE_REGION, // source region
+			CREATIVE_WORLD_NAME, // target world
+			loc.getX(), PASTE_Y, loc.getZ() // (x, y, z)
+		);
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 	}
 
 	// TODO Switch player to Player class and add player as UUID
@@ -94,11 +74,6 @@ public class CreatePlot extends Command {
 		allRegions.addRegion(region);
 	}
 
-	private BlockVector3 offsetVectorByRoad(BlockVector3 loc) {
-		loc = loc.withY(PASTE_Y);
-		return loc.subtract(ROAD_SIZE, 0 , ROAD_SIZE);
-	}
-
 	private BlockVector3 findPlotLocation() throws CommandExecutionException {
 		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
 		RegionManager allRegions = container.get(BukkitAdapter.adapt(CREATIVE_WORLD));
@@ -111,9 +86,9 @@ public class CreatePlot extends Command {
 
 		for (int i = 0; i < MAX_PLOTS; i++) {
 			BlockVector3 plotLocation = BlockVector3.at(
-					gridLocation.getX() * (REGION_SIZE + PLOT_DISTANCE),
-					WG_REGION_MIN_Y,
-					gridLocation.getZ()  * (REGION_SIZE + PLOT_DISTANCE)
+				gridLocation.getX() * (REGION_SIZE + PLOT_DISTANCE),
+				WG_REGION_MIN_Y,
+				gridLocation.getZ()  * (REGION_SIZE + PLOT_DISTANCE)
 			);
 			ApplicableRegionSet pointRegionSet = allRegions.getApplicableRegions(plotLocation);
 
@@ -130,8 +105,8 @@ public class CreatePlot extends Command {
 				// If it has hit a corner change the direction it is traveling
 				if (gridLocation.abs().getX() == gridLocation.abs().getZ()) {
 					moveDirection = BlockVector2.at(
-							-1 * moveDirection.getZ(),
-							moveDirection.getX()
+						-1 * moveDirection.getZ(),
+						moveDirection.getX()
 					);
 
 				}
@@ -148,7 +123,7 @@ public class CreatePlot extends Command {
 		cr.setBaseMessage("&c&lCreating Plot...");
 		if (sender instanceof Player) {
 			BlockVector3 plotLocation = findPlotLocation();
-			copyPlotToLocation(offsetVectorByRoad(plotLocation));
+			copyPlotToLocation(plotLocation);
 			createPlotRegion(plotLocation, (String) baseParameters.get(0));
 			cr.addMessage(String.format("&bPlot has been created for %s at &3&lX: %d&b,&3&l Z: %d &b!", baseParameters.get(0), plotLocation.getX(), plotLocation.getZ()));
 		}
