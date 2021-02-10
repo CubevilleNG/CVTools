@@ -33,7 +33,7 @@ import org.cubeville.commons.commands.CommandParameterString;
 import org.cubeville.commons.commands.CommandResponse;
 
 public class CreatePlot extends Command {
-
+	
 	private final World CREATIVE_WORLD = Bukkit.getServer().getWorld("plugin_test");
 
 	private final int REGION_SIZE = 9; // Size of the square region
