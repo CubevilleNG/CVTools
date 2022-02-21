@@ -37,7 +37,6 @@ public class CVTools extends JavaPlugin implements Listener {
         commandParser.addCommand(new CheckRegionPlayers());
         commandParser.addCommand(new CheckSign());
         commandParser.addCommand(new Clear());
-        commandParser.addCommand(new CreatePlot());
         commandParser.addCommand(new DelayedTask(this));
         DistanceTask distanceTask = new DistanceTask(this);
         commandParser.addCommand(new Distance(distanceTask));
@@ -49,6 +48,7 @@ public class CVTools extends JavaPlugin implements Listener {
         commandParser.addCommand(new KillEntities());
         commandParser.addCommand(new More());
         commandParser.addCommand(new PathBlockUtil());
+        commandParser.addCommand(new Syslog());
         commandParser.addCommand(new Time());
         commandParser.addCommand(new TimeSet());
         commandParser.addCommand(new Title());

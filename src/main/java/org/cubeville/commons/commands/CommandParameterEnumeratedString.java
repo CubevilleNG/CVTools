@@ -11,10 +11,10 @@ public class CommandParameterEnumeratedString implements CommandParameterType
         this.values = values;
     }
 
-    public CommandParameterEnumeratedString(String value1, String value2) {
-        values = new HashSet<>();
-        values.add(value1);
-        values.add(value2);
+    public CommandParameterEnumeratedString(String...values) {
+        this.values = new HashSet<>();
+        for(String value: values)
+            this.values.add(value);
     }
     
     public boolean isValid(String value) {
