@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandResponse {
-    private List<String> messages;
+    private List<String> messages = new ArrayList<>();
+    
     private boolean baseMessageSet;
-
+    private boolean silent;
+    
     public CommandResponse() {
-        messages = new ArrayList<>();
         baseMessageSet = false;
     }
         
     public CommandResponse(String message) {
-        messages = new ArrayList<>();
         messages.add(message);
         baseMessageSet = true;
     }
@@ -21,11 +21,16 @@ public class CommandResponse {
     public CommandResponse(String... messages) {
     	this.messages = new ArrayList<>();
     	for(String message: messages) {
-    		this.messages.add(message);
+            this.messages.add(message);
     	}
     	baseMessageSet = true;
     }
 
+    public CommandResponse(boolean silent) {
+        this.silent = silent;
+        baseMessageSet = false;
+    }
+    
     public void addMessage(String message) {
         messages.add(message);
     }
@@ -49,6 +54,10 @@ public class CommandResponse {
     public List<String> getMessages() {
         if(messages.size() == 0) return null;
         return messages;
+    }
+
+    public boolean isSilent() {
+        return silent;
     }
 }
     

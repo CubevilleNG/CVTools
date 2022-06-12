@@ -9,8 +9,21 @@ import org.bukkit.Color;
 public class ColorUtils {
 
     public static String addColor(String message) {
-    	message = "&r" + message;
-        return ChatColor.translateAlternateColorCodes('&', message);
+        boolean hasHeader = false;
+        if(message.startsWith("&") && message.length() > 1)
+            hasHeader = message.length() > 1 && message.startsWith("&") && "0123456789abcder".indexOf(message.charAt(1)) >= 0;
+        if(!hasHeader) message = "&f" + message;
+        String ret = ChatColor.translateAlternateColorCodes('&', message);
+        return ret;
+    }
+
+    public static String reverseColor(String message) {
+        for(int i = 0; i < message.length() - 1; i++) {
+            if(message.charAt(i) == '§' && "0123456789abcdeflonmkr".indexOf(message.charAt(i + 1)) >= 0) {
+                message = message.substring(0, i) + "&" + message.substring(i + 1);
+            }
+        }
+        return message;
     }
     
     public static String addColorWithoutHeader(String message) {

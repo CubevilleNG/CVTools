@@ -48,6 +48,7 @@ public class CommandParser
 
             if(cmdMatch >= 0) { 
                 CommandResponse response = cmd.execute(commandSender, args);
+                if(response != null && response.isSilent()) return true;
                 if(cmd.isSilentConsole() == false || commandSender instanceof Player) {
                     if(response == null) {
                         commandSender.sendMessage(ColorUtils.addColor("&aCommand executed successfully."));
@@ -66,12 +67,12 @@ public class CommandParser
                     }
                 }
                 return true;
-            }
+            } 
             
             if(parameterError != null) {
                 commandSender.sendMessage(ColorUtils.addColor("&c" + parameterError));
             }
-
+            
             else {
                 commandSender.sendMessage("Unknown command!");
             }
