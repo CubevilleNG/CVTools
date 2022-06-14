@@ -2,24 +2,27 @@ package org.cubeville.commons.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 
 public class ColorUtils {
 
+    private static final Pattern HEX_PATTERN = Pattern.compile("&#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})");
+
     public static String addColor(String message) {
         boolean hasHeader = false;
         if(message.startsWith("&") && message.length() > 1)
-            hasHeader = message.length() > 1 && message.startsWith("&") && "0123456789abcder".indexOf(message.charAt(1)) >= 0;
+            hasHeader = "0123456789abcdefr#".indexOf(message.charAt(1)) >= 0;
         if(!hasHeader) message = "&f" + message;
-        String ret = ChatColor.translateAlternateColorCodes('&', message);
-        return ret;
+        return addColorWithoutHeader(message);
     }
 
     public static String reverseColor(String message) {
         for(int i = 0; i < message.length() - 1; i++) {
-            if(message.charAt(i) == '§' && "0123456789abcdeflonmkr".indexOf(message.charAt(i + 1)) >= 0) {
+            if(message.charAt(i) == '§' && "0123456789abcdefklmnorx".indexOf(message.charAt(i + 1)) >= 0) {
                 message = message.substring(0, i) + "&" + message.substring(i + 1);
             }
         }
@@ -27,7 +30,13 @@ public class ColorUtils {
     }
     
     public static String addColorWithoutHeader(String message) {
-        return ChatColor.translateAlternateColorCodes('&', message);
+        // Replace any hexcode colors
+        Matcher matcher = HEX_PATTERN.matcher(message);
+        StringBuilder stringBuilder = new StringBuilder();
+        while(matcher.find()) {
+            matcher.appendReplacement(stringBuilder, ChatColor.of("#" + matcher.group(1)).toString());
+        }
+        return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(stringBuilder).toString());
     }
     
     public static List<String> addColor(List<String> strings) {
