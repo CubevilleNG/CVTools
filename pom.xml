@@ -14,7 +14,7 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.18.2-R0.1-SNAPSHOT</version>
+      <version>1.18-R0.1-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
@@ -38,8 +38,8 @@
 	<artifactId>maven-compiler-plugin</artifactId>
 	<version>3.1</version>
 	<configuration>
-	  <source>9</source>
-	  <target>9</target>
+	  <source>1.8</source>
+	  <target>1.8</target>
 	</configuration>
       </plugin>
     </plugins>
@@ -50,8 +50,14 @@
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
     <repository>
-      <id>sk89q-repo</id>
-      <url>https://maven.enginehub.org/repo/</url>
+      <id>sk89q-snapshots</id>
+      <url>http://maven.sk89q.com/artifactory/repo</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
 </project>
