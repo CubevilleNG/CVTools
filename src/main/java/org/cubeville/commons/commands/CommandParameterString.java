@@ -5,33 +5,33 @@ import java.util.regex.Pattern;
 
 public class CommandParameterString implements CommandParameterType
 {
-	Pattern pattern = null;
-	
-	public CommandParameterString() {
-		
-	}
-	
-	public CommandParameterString(String s) {
-		pattern = Pattern.compile(s);
-	}
-	
+    Pattern pattern = null;
+    
+    public CommandParameterString() {
+        
+    }
+    
+    public CommandParameterString(String s) {
+        pattern = Pattern.compile(s);
+    }
+    
     public boolean isValid(String value) {
     	if (pattern != null) {
-    		Matcher m = pattern.matcher(value);
-    		return (!m.find());
+            Matcher m = pattern.matcher(value);
+            return (!m.find());
     	} else {
-    		return true;
+            return true;
     	}
     }
-
+    
     public String getInvalidMessage(String value) {
     	if (pattern != null) {
-    		return "Invalid characters in string!";
+            return "Invalid characters in string!";
     	} else {
-    		return "";
+            return "";
     	}
     }
-
+    
     public Object getValue(String value) {
         return value;
     }

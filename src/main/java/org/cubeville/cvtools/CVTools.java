@@ -1,8 +1,5 @@
 package org.cubeville.cvtools;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -11,12 +8,9 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,6 +31,7 @@ public class CVTools extends JavaPlugin implements Listener {
         commandParser.addCommand(new CheckRegionPlayers());
         commandParser.addCommand(new CheckSign());
         commandParser.addCommand(new Clear());
+        commandParser.addCommand(new CountEntities());
         commandParser.addCommand(new DelayedTask(this));
         DistanceTask distanceTask = new DistanceTask(this);
         commandParser.addCommand(new Distance(distanceTask));

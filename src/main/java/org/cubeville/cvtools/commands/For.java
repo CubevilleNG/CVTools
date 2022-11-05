@@ -30,18 +30,17 @@ public class For extends BaseCommand {
         throws CommandExecutionException {
 
         Player player = (Player)sender;
-        String cmd = (String)baseParameters.get(1);
-        for(int i = 2; i < baseParameters.size(); i++) {
-            if(i > 1) cmd += " ";
-            cmd += (String)baseParameters.get(i);
-        }
 
         List<String> l = (List<String>)baseParameters.get(0);
 
         for(int i = 0; i < l.size(); i++) {
-            String scmd = cmd.replace("%f%", l.get(i));
-            player.performCommand(scmd);
+            for(int c = 1; c < baseParameters.size(); c++) {
+                String cmd = (String)baseParameters.get(c);
+                String scmd = cmd.replace("%f%", l.get(i));
+                player.performCommand(scmd);
+            }
         }
+
         return null;
     }
 
