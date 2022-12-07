@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Entity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -163,6 +165,38 @@ public class BlockUtils {
         return new Location(BukkitAdapter.adapt(getWESelection(player).getWorld()), min.getX(), min.getY(), min.getZ());
     }
 
+    public static List<Entity> getEntitiesInWESelection(Player player) {
+        Vector min = getWESelectionMin(player).toVector();
+        Vector max = getWESelectionMax(player).toVector();
+        max.setX(max.getX() + 0.999);
+        max.setY(max.getY() + 0.999);
+        max.setZ(max.getZ() + 0.999);
+
+        List<Entity> ret = new ArrayList<>();
+        for(Entity e: player.getLocation().getWorld().getEntities()) {
+            if(e.getLocation().toVector().isInAABB(min, max))
+                ret.add(e);
+        }
+        return ret;
+    }
+
+    public static List<Entity> getEntitiesWithinRadius(Location loc, double radius) {
+        List<Entity> ret = new ArrayList<>();
+        for(Entity e: loc.getWorld().getEntities()) {
+            if(e.getLocation().distance(loc) <= radius)
+                ret.add(e);
+        }
+        return ret;
+    }
+
+    public static List<Entity> filterEntitiesByType(List<Entity> entities, EntityType type) {
+        List<Entity> ret = new ArrayList<>();
+        for(Entity e: entities)
+            if(e.getType() == type)
+                ret.add(e);
+        return ret;
+    }
+    
     public static ProtectedRegion getWGRegion(World world, String name) {
         WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();

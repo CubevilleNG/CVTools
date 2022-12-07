@@ -1,6 +1,7 @@
 package org.cubeville.cvtools.commands;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +33,7 @@ public class KillEntities extends BaseCommand {
         addParameter("world", true, new CommandParameterWorld());
         addParameter("type", false, new CommandParameterEnum(EntityType.class));
         addParameter("noplayer", true, new CommandParameterInteger());
+        addParameter("max", true, new CommandParameterInteger());
         setPermission("cvtools.killentities");
         setSilentConsole();
     }
@@ -58,6 +60,10 @@ public class KillEntities extends BaseCommand {
 
         boolean noPassenger = flags.contains("nopassenger");
 
+        int max = 10;
+        if(parameters.containsKey("max"))
+            max = (Integer) parameters.get("max");
+
         ProtectedRegion region = null;
         int radius = -1;
         if(parameters.get("wg") != null) {
@@ -70,9 +76,9 @@ public class KillEntities extends BaseCommand {
         }
         else throw new CommandExecutionException("Either wg or r parameters must be used.");
         
-        int ret = 0;
-        
         List<Entity> entities = world.getEntities();
+        List<Entity> entitiesForDeletion = new ArrayList<>();
+
         for(Entity entity: entities) {
             if(entity.getType() != parameters.get("type")) continue;
 
@@ -94,11 +100,19 @@ public class KillEntities extends BaseCommand {
                 }
                 if(playerInRadius) continue;
             }
-            entity.remove();
-            ret++;
+            entitiesForDeletion.add(entity);
         }
 
-        return new CommandResponse("&a" + (ret > 0 ? ret : "No") + " entities removed.");
+        int cnt = entitiesForDeletion.size();
+        if(cnt <= max) {
+            for(Entity entity: entitiesForDeletion)
+                entity.remove();
+        }
+        else {
+            return new CommandResponse("&cThis would delete " + cnt + " entities, the maximum is " + max + ". Use the max:<number> parameter to increase the maximum.");
+        }
+
+        return new CommandResponse("&a" + (cnt > 0 ? cnt : "No") + " entities removed.");
     }
 
 }

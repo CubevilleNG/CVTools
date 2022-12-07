@@ -1,3 +1,4 @@
+
 package org.cubeville.commons.commands;
 
 import java.util.List;
@@ -67,7 +68,7 @@ public class CommandParser
                     }
                 }
                 return true;
-            } 
+            }
             
             if(parameterError != null) {
                 commandSender.sendMessage(ColorUtils.addColor("&c" + parameterError));

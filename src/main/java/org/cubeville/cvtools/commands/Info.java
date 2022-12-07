@@ -14,6 +14,7 @@ import org.cubeville.commons.commands.CommandParameterEnumeratedString;
 import org.cubeville.commons.commands.CommandResponse;
 
 import org.cubeville.commons.utils.BlockUtils;
+import org.cubeville.commons.utils.ColorUtils;
 
 public class Info extends Command {
 
@@ -22,6 +23,7 @@ public class Info extends Command {
         Set<String> types = new HashSet<>();
         types.add("world");
         types.add("selection");
+        types.add("color");
         addBaseParameter(new CommandParameterEnumeratedString(types));
     }
 
@@ -41,6 +43,9 @@ public class Info extends Command {
             int length = max.getBlockZ() - min.getBlockZ() + 1;
             int height = max.getBlockY() - min.getBlockY() + 1;
             ret.addMessage("Selection: Width=" + width + ", Length=" + length + ", Height=" + height + ", Area=" + area);
+        }
+        else if(type.equals("color")) {
+            System.out.println("Color string: " + ColorUtils.addColorWithoutHeader("&#fec"));
         }
         return ret;
     }

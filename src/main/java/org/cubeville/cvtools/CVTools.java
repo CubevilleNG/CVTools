@@ -1,6 +1,5 @@
 package org.cubeville.cvtools;
 
-
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.EntityEffect;
