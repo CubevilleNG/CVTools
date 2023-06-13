@@ -1,19 +1,20 @@
 package org.cubeville.cvtools;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.EntityEffect;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.Levelled;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import org.cubeville.commons.commands.CommandParser;
 
@@ -80,4 +81,18 @@ public class CVTools extends JavaPlugin implements Listener {
         return false;
     }
 
+    @EventHandler
+    public void onLightBlockInteract(PlayerInteractEvent event) {
+        if(event.getPlayer() == null) return;
+        if(event.getClickedBlock() == null) return;
+        if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
+        if(event.getItem() == null || !event.getItem().equals(new ItemStack(Material.LIGHT))) return;
+        if(!event.getClickedBlock().getType().equals(Material.LIGHT)) return;
+        if(!event.getPlayer().getGameMode().equals(GameMode.CREATIVE) || !event.getPlayer().hasPermission("cvtools.changelightblock")) return;
+        Block lightBlock = event.getClickedBlock();
+        Levelled level = (Levelled) lightBlock.getBlockData();
+        int i = level.getLevel() + 1 == 16 ? 0 : level.getLevel() + 1;
+        level.setLevel(i);
+        lightBlock.setBlockData(level, true);
+    }
 }
