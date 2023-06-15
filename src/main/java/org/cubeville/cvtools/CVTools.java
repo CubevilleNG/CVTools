@@ -2,17 +2,21 @@ package org.cubeville.cvtools;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -94,5 +98,29 @@ public class CVTools extends JavaPlugin implements Listener {
         int i = level.getLevel() + 1 == 16 ? 0 : level.getLevel() + 1;
         level.setLevel(i);
         lightBlock.setBlockData(level, true);
+    }
+
+    @EventHandler
+    public void onMobSpawnerInteract(PlayerInteractEvent event) {
+        if(event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
+        if(event.getPlayer().isOp() || event.getPlayer().hasPermission("mobeggspawnerblocker.override")) return;
+        if(event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+        Block block = event.getClickedBlock();
+        if(block == null) return;
+        if(!block.getType().equals(Material.SPAWNER)) return;
+        ItemStack item = event.getItem();
+        if(item == null) return;
+        if(!(item.getItemMeta() instanceof SpawnEggMeta)) return;
+        CreatureSpawner cs = (CreatureSpawner) block.getState();
+        final Location loc = cs.getLocation();
+        final EntityType type = cs.getSpawnedType();
+        event.getPlayer().sendMessage(org.bukkit.ChatColor.RED + "Changing spawners using mob eggs is disabled on this server");
+        event.setCancelled(true);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+            Block block1 = loc.getBlock();
+            if(block1 == null || !block1.getType().equals(Material.SPAWNER)) return;
+            CreatureSpawner cs1 = (CreatureSpawner) block1.getState();
+            cs1.setSpawnedType(type);
+        });
     }
 }
