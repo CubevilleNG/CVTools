@@ -53,6 +53,7 @@ public class CVTools extends JavaPlugin implements Listener {
         commandParser.addCommand(new TimeSet());
         commandParser.addCommand(new Title());
         commandParser.addCommand(new Weather());
+        commandParser.addCommand(new SpawnFrog());
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(this, this);
