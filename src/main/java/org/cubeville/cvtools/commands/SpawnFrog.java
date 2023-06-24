@@ -1,8 +1,8 @@
 package org.cubeville.cvtools.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Frog;
 import org.bukkit.entity.Player;
@@ -37,6 +37,10 @@ public class SpawnFrog extends BaseCommand {
         Location location = player.getTargetBlock(null, 5).getLocation().add(0.5, 1, 0.5);
         Frog frog = (Frog) player.getWorld().spawnEntity(location, EntityType.FROG);
         frog.setVariant(type);
-        return new CommandResponse(parameters.get("type") + " frog spawned at " + location.getX() + ";" + location.getY() + ";" + location.getZ() + ";" + location.getWorld().getName());
+        if(location.getWorld().getLivingEntities().contains(frog)) {
+            return new CommandResponse(parameters.get("type") + " frog spawned at " + location.getX() + ";" + location.getY() + ";" + location.getZ() + ";" + location.getWorld().getName());
+        } else {
+            throw new CommandExecutionException("Unable to spawn frog here! Check mobcap or region permissions!");
+        }
     }
 }
