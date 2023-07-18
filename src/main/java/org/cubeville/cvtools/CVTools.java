@@ -12,8 +12,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SpawnEggMeta;
@@ -123,5 +125,16 @@ public class CVTools extends JavaPlugin implements Listener {
             CreatureSpawner cs1 = (CreatureSpawner) block1.getState();
             cs1.setSpawnedType(type);
         });
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onAllaySpawn(EntitySpawnEvent event) {
+        if(event.isCancelled()) return;
+        if(!event.getEntityType().equals(EntityType.ALLAY)) return;
+        if(event.getLocation().getWorld() == null) return;
+        String world = event.getLocation().getWorld().getName();
+        if(world.equalsIgnoreCase("creative") || world.equalsIgnoreCase("bb2023_update")) {
+            event.setCancelled(true);
+        }
     }
 }
