@@ -6,14 +6,21 @@ import java.util.List;
 public class CommandParameterList implements CommandParameterType
 {
     private List<CommandParameterType> parameters;
-
+    private int minLength = 0;
+    
     public CommandParameterList(List<CommandParameterType> parameters) {
         this.parameters = parameters;
+        minLength = parameters.size();
     }
 
+    public CommandParameterList(List<CommandParameterType> parameters, int minLength) {
+        this.parameters = parameters;
+        this.minLength = minLength;
+    }
+    
     public boolean isValid(String value) {
         List<String> parts = splitParameterList(value);
-        if(parts.size() != parameters.size()) return false;
+        if(parts.size() < minLength) return false;
         for(int i = 0; i < parts.size(); i++) {
             if(!parameters.get(i).isValid(parts.get(i))) return false;
         }

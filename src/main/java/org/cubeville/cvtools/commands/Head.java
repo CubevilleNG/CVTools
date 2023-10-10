@@ -3,6 +3,7 @@ package org.cubeville.cvtools.commands;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -18,7 +19,6 @@ public class Head extends BaseCommand {
     public Head() {
         super("head");
         addBaseParameter(new CommandParameterString());
-        addBaseParameter(new CommandParameterString());
         addParameter("name", true, new CommandParameterString());
         addParameter("player", true, new CommandParameterOnlinePlayer());
         setPermission("cvtools.head");
@@ -27,8 +27,7 @@ public class Head extends BaseCommand {
     @Override
     public CommandResponse execute(CommandSender sender, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters)
         throws CommandExecutionException {
-        String uuid = (String) baseParameters.get(0);
-        String url = (String) baseParameters.get(1);
+        String url = (String) baseParameters.get(0);
         String name = (String) parameters.get("name");
         if(name == null) name = "Custom Head";
         Player player;
@@ -41,8 +40,7 @@ public class Head extends BaseCommand {
         else {
             throw new CommandExecutionException("Player parameter must be set if using on console.");
         }
-        String command = "minecraft:give " + player.getName() + " minecraft:player_head{display:{Name:\"" + ColorUtils.addColor(name) + "\"},SkullOwner:{Id:\"" + uuid + "\", Properties:{textures:[{Value:\"" + url + "\"}]}}}";
-        System.out.println("Execute command: " + command);
+        String command = "minecraft:give " + player.getName() + " minecraft:player_head{display:{Name:\"" + ColorUtils.addColor(name) + "\"},SkullOwner:{Id:\"" + UUID.randomUUID() + "\", Properties:{textures:[{Value:\"" + url + "\"}]}}}";
         Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
         return null;
     }
