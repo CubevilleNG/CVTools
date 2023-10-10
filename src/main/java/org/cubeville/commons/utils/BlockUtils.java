@@ -138,6 +138,7 @@ public class BlockUtils {
         BlockVector3 wep2 = BlockVector3.at(pos2.getBlockX(), pos2.getBlockY(), pos2.getBlockZ());
         CuboidRegionSelector selector = new CuboidRegionSelector(BukkitAdapter.adapt(world), wep1, wep2);
         worldEdit.getSession(player).setRegionSelector(BukkitAdapter.adapt(world), selector);
+        selector.explainRegionAdjust(BukkitAdapter.adapt(player), worldEdit.getSession(player));
         //Selection selection = new CuboidSelection(world, wep1, wep2);
         //worldEdit.setSelection(player, selection);
     }
