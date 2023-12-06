@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class HeadManager {
 
@@ -40,7 +39,6 @@ public class HeadManager {
             if(headSet == null) return;
             while(headSet.next()) {
                 Location loc = new Location(Bukkit.getWorld(headSet.getString("worldName")), headSet.getFloat("x"), headSet.getFloat("y"), headSet.getFloat("z"));
-                UUID player = UUID.fromString(headSet.getString("player"));
                 String name = headSet.getString("name");
                 List<String> lore = new ArrayList<>();
                 if(!Objects.equals(headSet.getString("lore0"), "null")) lore.add(headSet.getString("lore0"));
@@ -48,7 +46,7 @@ public class HeadManager {
                 if(!Objects.equals(headSet.getString("lore2"), "null")) lore.add(headSet.getString("lore2"));
                 if(!Objects.equals(headSet.getString("lore3"), "null")) lore.add(headSet.getString("lore3"));
                 if(!Objects.equals(headSet.getString("lore4"), "null")) lore.add(headSet.getString("lore4"));
-                Head head = new Head(loc, player, name, lore);
+                Head head = new Head(loc, name, lore);
                 this.heads.add(head);
             }
         } catch (SQLException e) {

@@ -20,7 +20,6 @@ public class HeadDB extends HeadSQL {
 
     public String SQLiteCreateHeadsTable = "CREATE TABLE IF NOT EXISTS heads (" +
             "`headID` INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "`player` varchar(64) NOT NULL," +
             "`name` varchar(255) NOT NULL," +
             "`lore0` varchar(255)," +
             "`lore1` varchar(255)," +
@@ -58,8 +57,8 @@ public class HeadDB extends HeadSQL {
         String lore2 = (head.getLore() != null && head.getLore().size() > 2) ? head.getLore().get(2) : null;
         String lore3 = (head.getLore() != null && head.getLore().size() > 3) ? head.getLore().get(3) : null;
         String lore4 = (head.getLore() != null && head.getLore().size() > 4) ? head.getLore().get(4) : null;
-        update("INSERT INTO `heads` (player, name, lore0, lore1, lore2, lore3, lore4, worldName, x, y, z) " +
-                "VALUES(\"" + head.getPlayer().toString() + "\", \"" + head.getName() + "\", \"" + lore0 + "\", \"" + lore1 + "\", \"" + lore2 + "\", \"" + lore3 + "\", \"" + lore4 + "\", \"" + Objects.requireNonNull(loc.getWorld()).getName() + "\", \"" + loc.getX() + "\", \"" + loc.getY() + "\", \"" + loc.getZ() + "\");"
+        update("INSERT INTO `heads` (name, lore0, lore1, lore2, lore3, lore4, worldName, x, y, z) " +
+                "VALUES(\"" + head.getName() + "\", \"" + lore0 + "\", \"" + lore1 + "\", \"" + lore2 + "\", \"" + lore3 + "\", \"" + lore4 + "\", \"" + Objects.requireNonNull(loc.getWorld()).getName() + "\", \"" + loc.getX() + "\", \"" + loc.getY() + "\", \"" + loc.getZ() + "\");"
         );
     }
 
