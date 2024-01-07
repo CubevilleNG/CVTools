@@ -154,17 +154,6 @@ public class CVTools extends JavaPlugin implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onAllaySpawn(EntitySpawnEvent event) {
-        if(event.isCancelled()) return;
-        if(!event.getEntityType().equals(EntityType.ALLAY)) return;
-        if(event.getLocation().getWorld() == null) return;
-        String world = event.getLocation().getWorld().getName();
-        if(world.equalsIgnoreCase("creative") || world.equalsIgnoreCase("bb2023_update")) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
     public void onHeadPlace(BlockPlaceEvent event) {
         if(event.isCancelled()) return;
         Block block = event.getBlock();
