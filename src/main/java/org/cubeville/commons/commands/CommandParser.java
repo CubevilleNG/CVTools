@@ -1,4 +1,3 @@
-
 package org.cubeville.commons.commands;
 
 import java.util.List;
@@ -22,13 +21,18 @@ public class CommandParser
     }
 
     public boolean execute(CommandSender commandSender, String[] argsIn) {
+        CommandOutputProcessor cop = new CommandSenderCommandOutputProcessor(commandSender);
+        return execute(commandSender, argsIn, cop);
+    }
+    
+    public boolean execute(CommandSender commandSender, String[] argsIn, CommandOutputProcessor outputProcessor) {
         try {
             String full = "";
             for (String arg: argsIn) {
                 if(full.length() > 0) full = full + " ";
                 full += arg;
             }
-
+            
             String[] args = smartSplit(full).toArray(new String[0]);
 
             String parameterError = null;
@@ -47,21 +51,21 @@ public class CommandParser
                 }
             }
 
-            if(cmdMatch >= 0) { 
+            if(cmdMatch >= 0) {
                 CommandResponse response = cmd.execute(commandSender, args);
                 if(response != null && response.isSilent()) return true;
                 if(cmd.isSilentConsole() == false || commandSender instanceof Player) {
                     if(response == null) {
-                        commandSender.sendMessage(ColorUtils.addColor("&aCommand executed successfully."));
+                        outputProcessor.sendMessage(ColorUtils.addColor("&aCommand executed successfully."));
                     }
                     else {
                         if(response.getMessages() == null) {
-                            commandSender.sendMessage(ColorUtils.addColor("&cNothing. Nada. Niente."));
+                            outputProcessor.sendMessage(ColorUtils.addColor("&cNothing. Nada. Niente."));
                         }
                         else {
                             for (String message: response.getMessages()) {
                                 if(!message.equals("")) {
-                                    commandSender.sendMessage(ColorUtils.addColor(message));
+                                    outputProcessor.sendMessage(ColorUtils.addColor(message));
                                 }
                             }
                         }
@@ -71,11 +75,11 @@ public class CommandParser
             }
             
             if(parameterError != null) {
-                commandSender.sendMessage(ColorUtils.addColor("&c" + parameterError));
+                outputProcessor.sendMessage(ColorUtils.addColor("&c" + parameterError));
             }
             
             else {
-                commandSender.sendMessage("Unknown command!");
+                outputProcessor.sendMessage("Unknown command!");
             }
             return false;
         }
@@ -91,7 +95,7 @@ public class CommandParser
             else {
                 msg = ColorUtils.addColor(e.getMessage());
             }
-            commandSender.sendMessage(msg);
+            outputProcessor.sendMessage(msg);
             return true;
         }
     }

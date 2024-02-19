@@ -27,6 +27,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import org.cubeville.commons.commands.CommandParser;
+import org.cubeville.commons.commands.StringCommandOutputProcessor;
 
 import org.cubeville.cvtools.commands.*;
 import org.cubeville.cvtools.heads.HeadDB;
@@ -34,6 +35,8 @@ import org.cubeville.cvtools.heads.HeadManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +47,21 @@ public class CVTools extends JavaPlugin implements Listener {
     private HeadDB headDB;
     private HeadManager headManager;
 
+    private static CVTools instance;
+
+    class CommandParserRegistryEntry {
+        CommandParserRegistryEntry(String permission, CommandParser commandParser) {
+            this.commandParser = commandParser;
+            this.permission = permission;
+        }
+        CommandParser commandParser;
+        String permission;
+    }
+    Map<String, CommandParserRegistryEntry> commandParserRegistry = new HashMap<>();
+
     public void onEnable() {
+        instance = this;
+
         final File dataDir = getDataFolder();
         if(!dataDir.exists()) {
             dataDir.mkdirs();
@@ -87,6 +104,50 @@ public class CVTools extends JavaPlugin implements Listener {
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(this, this);
+    }
+
+    public static CVTools getInstance() {
+        return instance;
+    }
+    
+    public void registerCommandParser(String command, String permission, CommandParser commandParser) {
+        commandParserRegistry.put(command, new CommandParserRegistryEntry(permission, commandParser));
+    }
+
+    public String runCommand(String playerUUID, String command) {
+        String pcmd = command;
+        String args = "";
+        
+        {
+            int idx = pcmd.indexOf(' ');
+            if(idx != -1) {
+                args = pcmd.substring(idx + 1);
+                pcmd = pcmd.substring(0, idx);
+            }
+        }
+
+        if(! commandParserRegistry.containsKey(pcmd)) {
+            return "&cCommand not registered.";
+        }
+
+        CommandSender cs = null;
+        if(playerUUID != null) {
+            cs = Bukkit.getPlayer(UUID.fromString(playerUUID));
+        }
+        if(cs == null) return "&cPlayer not found.";
+
+        CommandParserRegistryEntry cpre = commandParserRegistry.get(pcmd);
+        if(! cs.hasPermission(cpre.permission)) {
+            return "&cNo permission.";
+        }
+
+        CommandParser cp = cpre.commandParser;
+        StringCommandOutputProcessor cop = new StringCommandOutputProcessor();
+
+        String aargs[] = { args };
+        cp.execute(cs, aargs, cop);
+
+        return cop.toString();
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
