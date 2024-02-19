@@ -14,9 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -37,8 +35,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 public class CVTools extends JavaPlugin implements Listener {
 
@@ -217,46 +215,109 @@ public class CVTools extends JavaPlugin implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onAllaySpawn(EntitySpawnEvent event) {
-        if(event.isCancelled()) return;
-        if(!event.getEntityType().equals(EntityType.ALLAY)) return;
-        if(event.getLocation().getWorld() == null) return;
-        String world = event.getLocation().getWorld().getName();
-        if(world.equalsIgnoreCase("creative") || world.equalsIgnoreCase("bb2023_update")) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
     public void onHeadPlace(BlockPlaceEvent event) {
         if(event.isCancelled()) return;
         Block block = event.getBlock();
         if(!block.getType().equals(Material.PLAYER_HEAD) && !block.getType().equals(Material.PLAYER_WALL_HEAD)) return;
         ItemMeta meta = event.getItemInHand().getItemMeta();
         if(meta == null) return;
-        if(((SkullMeta)meta).getOwningPlayer() == null) return;
-        UUID player = ((SkullMeta) meta).getOwningPlayer().getUniqueId();
         String name = meta.getDisplayName();
         List<String> lore = meta.getLore();
-        headManager.addHead(new org.cubeville.cvtools.heads.Head(block.getLocation(), player, name, lore));
+        headManager.addHead(new org.cubeville.cvtools.heads.Head(block.getLocation(), name, lore));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onHeadBreak(BlockBreakEvent event) {
+    public void onHeadBreakByPistonExtend(BlockPistonExtendEvent event) {
         if(event.isCancelled()) return;
-        Block block = event.getBlock();
-        if(!block.getType().equals(Material.PLAYER_HEAD) && !block.getType().equals(Material.PLAYER_WALL_HEAD)) return;
-        org.cubeville.cvtools.heads.Head head = headManager.getHead(block.getLocation());
+        Block toBlock = event.getBlock().getRelative(event.getDirection());
+        if(toBlock.getType().equals(Material.PLAYER_HEAD) || toBlock.getType().equals(Material.PLAYER_WALL_HEAD)) {
+            Location toLoc = toBlock.getLocation();
+            org.cubeville.cvtools.heads.Head head = headManager.getHead(toLoc);
+            if(head != null) {
+                executeDrops(toBlock, toLoc, head);
+                toBlock.setType(Material.AIR);
+                headManager.removeHead(head);
+            }
+        }
+        List<Block> movingBlocks = event.getBlocks();
+        if(!movingBlocks.isEmpty()) {
+            for(Block block : movingBlocks) {
+                Block movingToBlock = block.getRelative(event.getDirection());
+                if(!movingToBlock.getType().equals(Material.PLAYER_HEAD) && !movingToBlock.getType().equals(Material.PLAYER_WALL_HEAD)) continue;
+                Location movingToLoc = movingToBlock.getLocation();
+                org.cubeville.cvtools.heads.Head head = headManager.getHead(movingToLoc);
+                if(head != null) {
+                    executeDrops(movingToBlock, movingToLoc, head);
+                    movingToBlock.setType(Material.AIR);
+                    headManager.removeHead(head);
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onHeadBreakByPistonRetract(BlockPistonRetractEvent event) {
+        if(event.isCancelled()) return;
+        List<Block> movingBlocks = event.getBlocks();
+        if(!movingBlocks.isEmpty()) {
+            for(Block block : movingBlocks) {
+                Block movingToBlock = block.getRelative(event.getDirection());
+                if(!movingToBlock.getType().equals(Material.PLAYER_HEAD) && !movingToBlock.getType().equals(Material.PLAYER_WALL_HEAD)) continue;
+                Location movingToLoc = movingToBlock.getLocation();
+                org.cubeville.cvtools.heads.Head head = headManager.getHead(movingToLoc);
+                if(head != null) {
+                    executeDrops(movingToBlock, movingToLoc, head);
+                    movingToBlock.setType(Material.AIR);
+                    headManager.removeHead(head);
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onHeadBreakByWater(BlockFromToEvent event) {
+        if(event.isCancelled()) return;
+        Location toLoc = event.getToBlock().getLocation();
+        org.cubeville.cvtools.heads.Head head = headManager.getHead(toLoc);
         if(head == null) return;
-        event.setDropItems(false);
+        event.setCancelled(true);
+        Block fromBlock = event.getBlock();
+        Block toBlock = event.getToBlock();
+        executeDrops(toBlock, toLoc, head);
+        toBlock.setType(fromBlock.getType());
+        Levelled data = (Levelled) fromBlock.getBlockData();
+        data.setLevel(data.getLevel() + 1);
+        toBlock.setBlockData(data);
+
         headManager.removeHead(head);
-        if(!event.getPlayer().getGameMode().equals(GameMode.SURVIVAL)) return;
-        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setOwningPlayer(Bukkit.getOfflinePlayer(head.getPlayer()));
-        meta.setDisplayName(head.getName());
-        meta.setLore(head.getLore());
-        item.setItemMeta(meta);
-        block.getLocation().getWorld().dropItem(block.getLocation(), item);
+    }
+
+    public void executeDrops(Block toBlock, Location toLoc, org.cubeville.cvtools.heads.Head head) {
+        Collection<ItemStack> drops = toBlock.getDrops();
+        for(ItemStack item : drops) {
+            if(!item.getType().equals(Material.PLAYER_HEAD) && !item.getType().equals(Material.PLAYER_WALL_HEAD)) continue;
+            SkullMeta meta = (SkullMeta) item.getItemMeta();
+            meta.setDisplayName(head.getName());
+            meta.setLore(head.getLore());
+            item.setItemMeta(meta);
+        }
+        for(ItemStack i : drops) toLoc.getWorld().dropItem(toLoc, i);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onHeadBreakByPlayer(BlockDropItemEvent event) {
+        if(event.isCancelled()) return;
+        org.cubeville.cvtools.heads.Head head = headManager.getHead(event.getBlock().getLocation());
+        if(head == null) return;
+        List<org.bukkit.entity.Item> drops = event.getItems();
+        for(org.bukkit.entity.Item item : drops) {
+            ItemStack i = item.getItemStack();
+            if(!i.getType().equals(Material.PLAYER_HEAD) && !i.getType().equals(Material.PLAYER_WALL_HEAD)) continue;
+            SkullMeta meta = (SkullMeta) i.getItemMeta();
+            meta.setDisplayName(head.getName());
+            meta.setLore(head.getLore());
+            i.setItemMeta(meta);
+            headManager.removeHead(head);
+        }
     }
 }
